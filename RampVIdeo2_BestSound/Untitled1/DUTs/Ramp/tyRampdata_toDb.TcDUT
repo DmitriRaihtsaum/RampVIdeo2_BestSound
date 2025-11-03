@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="tyRampdata_toDb" Id="{b990cd32-65e7-47d7-8e26-3319205349eb}">
+    <Declaration><![CDATA[TYPE tyRampdata_toDb :
+STRUCT
+	iRampStepOutput : INT ;
+	tRampStepTime : TIME ; 
+	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="enRampStateMode" Id="{c5f21dff-f343-4507-8c05-fdd0b88d4721}">
+    <Declaration><![CDATA[{attribute 'qualified_only'}
+{attribute 'strict'}
+{attribute 'to_string'}
+
+TYPE enRampStateMode :
+(
+	RampIdle := 0,
+    RampInit := 1,
+    RampRun := 2,
+    RampIncrement := 3,
+    RampDone := 4,
+    RampError := 100
+);
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

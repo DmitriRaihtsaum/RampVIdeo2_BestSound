@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="tyRampDb" Id="{e08b5bf0-a6ae-40da-a0b8-057264e49fcf}">
+    <Declaration><![CDATA[TYPE tyRampDb :
+STRUCT	
+	aRampData: ARRAY[0..1000] OF tyRampdata_toDb;
+	
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

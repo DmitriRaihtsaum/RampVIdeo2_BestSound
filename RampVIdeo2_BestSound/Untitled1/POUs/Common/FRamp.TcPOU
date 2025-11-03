@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <POU Name="FRamp" Id="{5c023fb4-e9b9-40d1-99e3-3ed402ed4ce5}" SpecialFunc="None">
+    <Declaration><![CDATA[FUNCTION_BLOCK FRamp
+VAR_INPUT
+	TestMode : BOOL ; 
+	ErrorTest: BOOL; 
+	Input : tyRampInputs; 
+	
+END_VAR
+VAR_OUTPUT
+	Output: tyRampOutputs; 
+END_VAR
+VAR
+	StepMode : enRampStateMode := enRampStateMode.RampIdle; 
+	i: INT;
+	iPointer : INT; 
+ ArrayPointer : INT ;
+ StepTimer : TON; 
+ RampDb :tyRampDb; 
+ MaxTimer:Ton; 
+ 
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[//Delete after test
+IF NOT TestMode THEN 
+	Input.tRampProgramTimeLimit := T#120S;
+Input.iNumberOfSteps :=5; 
+FOR i :=0 TO Input.iNumberOfSteps DO 
+RampDb.aRampData[i].iRampStepOutput := i+ 1;
+	RampDb.aRampData[i].tRampStepTime := T#5S; 
+	END_FOR
+	ELSE 
+		Input.iNumberOfSteps :=0; 
+FOR i :=0 TO Input.iNumberOfSteps DO 
+RampDb.aRampData[i].iRampStepOutput := 0;
+	RampDb.aRampData[i].tRampStepTime := T#0MS; 
+	END_FOR
+END_IF
+
+
+
+CASE StepMode OF 
+
+enRampStateMode.RampIdle : 
+ArrayPointer := 0; 
+iPointer :=0; 
+Output.iCurrentStep := 0; 
+Output.bRampActivated := FALSE; 
+Output.bRampDone :=FALSE; 
+FOR i :=0 TO 10 DO 
+	Output.dwError[i] := FALSE; 
+END_FOR 
+IF Input.bActivateRamp THEN 
+StepMode := 	enRampStateMode.RampInit ;
+END_IF
+
+; 	
+enRampStateMode.RampInit : 
+IF Input.iNumberOfSteps = 0 THEN 
+	Output.dwError[0] := TRUE; 
+	StepMode := 	enRampStateMode.RampError ;
+END_IF
+;
+FOR i :=0 TO Input.iNumberOfSteps DO 
+	IF RampDb.aRampData[i].iRampStepOutput = 0 OR RampDb.aRampData[i].tRampStepTime  <  T#1MS THEN 
+		Output.dwError[1] := TRUE;
+		StepMode := 	enRampStateMode.RampError ;
+	END_IF;
+END_FOR
+StepTimer(IN:=FALSE,PT:= RampDb.aRampData[0].tRampStepTime);
+IF NOT Output.dwError[0]  OR Output.dwError[1]  THEN 
+	StepMode := 	enRampStateMode.RampRun ;
+END_IF
+;
+enRampStateMode.RampRun : 
+Output.bRampActivated :=TRUE;
+Output.iRampValueOutput:= RampDb.aRampData[iPointer].iRampStepOutput;
+StepTimer(IN:=TRUE,PT:= RampDb.aRampData[iPointer].tRampStepTime);
+IF StepTimer.Q THEN 
+	StepMode := 	enRampStateMode.RampIncrement ;
+END_IF;
+IF MaxTimer.Q THEN 
+Output.dwError[2] := TRUE;
+	StepMode := 	enRampStateMode.RampError ;
+END_IF
+
+;
+enRampStateMode.RampIncrement : 
+StepTimer(IN:=FALSE,PT:= RampDb.aRampData[iPointer].tRampStepTime);
+IF iPointer < Input.iNumberOfSteps THEN 
+	iPointer := iPointer +1; 
+	StepMode := 	enRampStateMode.RampRun;
+	ELSE 
+		StepMode := 	enRampStateMode.RampDone ;
+END_IF
+
+;
+enRampStateMode.RampDone : 
+Output.bRampDone :=TRUE; 
+;
+enRampStateMode.RampError : 
+Output.dwError[3] := TRUE;
+;
+
+END_CASE
+
+IF NOT Input.bActivateRamp OR Input.bResetRamp THEN 
+	StepMode := 	enRampStateMode.RampInit ;
+END_IF
+
+IF StepMode = enRampStateMode.RampRun OR StepMode = enRampStateMode.RampInit THEN 
+MaxTimer(IN:=TRUE, PT:= Input.tRampProgramTimeLimit);	
+ELSE
+	MaxTimer(IN:=FALSE, PT:= Input.tRampProgramTimeLimit);		
+	END_IF
+]]></ST>
+    </Implementation>
+  </POU>
+</TcPlcObject>

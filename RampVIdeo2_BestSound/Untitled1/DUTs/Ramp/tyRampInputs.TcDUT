@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="tyRampInputs" Id="{c43b9272-8d53-4178-8184-24b69009a6f0}">
+    <Declaration><![CDATA[TYPE tyRampInputs :
+STRUCT
+	bActivateRamp : BOOL; 
+	bResetRamp :BOOL; 
+	iNumberOfSteps : INT ;
+	tRampProgramTimeLimit : time ;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>

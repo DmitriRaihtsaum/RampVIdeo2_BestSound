@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1">
+  <DUT Name="tyRampOutputs" Id="{c4367998-865c-44a0-ac7b-aa502212af99}">
+    <Declaration><![CDATA[TYPE tyRampOutputs :
+STRUCT
+bRampActivated: BOOL ; 	
+iRampValueOutput : INT ; 
+iCurrentStep :INT ; 
+bRampDone : BOOL;
+dwError: ARRAY[0..10] OF BOOL; ; 
+END_STRUCT
+END_TYPE
+]]></Declaration>
+  </DUT>
+</TcPlcObject>
